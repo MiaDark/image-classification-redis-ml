@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Classifier</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .upload-container { border: 2px dashed #ccc; padding: 30px; text-align: center; border-radius: 8px; }
+    button { background: #4CAF50; color: white; border: none; padding: 10px 20px; margin-top: 15px; cursor: pointer; }
+    #result { margin-top: 20px; padding: 15px; background: #f8f8f8; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Image Classification</h1>
+  <div class="upload-container">
+    <h2>Upload an Image</h2>
+    <input type="file" id="imgInput" accept="image/*">
+    <button onclick="uploadImage()">Classify Image</button>
+    <div id="result">Results will appear here</div>
+  </div>
+
+  <script>
+    async function uploadImage() {
+      const fileInput = document.getElementById('imgInput');
+      const resultDiv = document.getElementById('result');
+      
+      if (!fileInput.files || fileInput.files.length === 0) {
+        resultDiv.innerText = "Please select an image first.";
+        return;
+      }
+
+      const file = fileInput.files[0];
+      resultDiv.innerText = "Processing...";
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const res = await fetch('/predict', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
+        const data = await res.json();
+        resultDiv.innerHTML = `
+          <strong>Prediction:</strong> ${data.prediction}<br>
+          <small>${data.cached ? "(cached result)" : "(new analysis)"}</small>
+        `;
+      } catch (error) {
+        resultDiv.innerText = `Error: ${error.message}`;
+      }
+    }
+  </script>
+</body>
+</html>

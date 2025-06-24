@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+redis
+tensorflow
+pillow
+python-multipart
+python-dotenv
